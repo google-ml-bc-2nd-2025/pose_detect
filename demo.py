@@ -161,10 +161,10 @@ def run(cfg,
         
         results[_id]['pose'] = pred_pose
         results[_id]['trans'] = pred_trans
-        results[_id]['pose_world'] = pred_pose_world
-        results[_id]['trans_world'] = pred['trans_world'].cpu().squeeze(0).numpy()
+        #results[_id]['pose_world'] = pred_pose_world
+        #results[_id]['trans_world'] = pred['trans_world'].cpu().squeeze(0).numpy()
         results[_id]['betas'] = pred['betas'].cpu().squeeze(0).numpy()
-        results[_id]['verts'] = (pred['verts_cam'] + pred['trans_cam'].unsqueeze(1)).cpu().numpy()
+        #results[_id]['verts'] = (pred['verts_cam'] + pred['trans_cam'].unsqueeze(1)).cpu().numpy()
         results[_id]['frame_ids'] = frame_id
     
     if save_pkl:
