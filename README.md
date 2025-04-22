@@ -1,4 +1,4 @@
-# pose_detect
+# 애니매이션 포즈 추출 
 
 1. dataset 폴더에 SMPL Neutral, Male, Female 저장
 2. `fetch_demo_dataset.sh` 파일 실행해서 체크포인트 다운받기
