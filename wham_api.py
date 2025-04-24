@@ -17,7 +17,9 @@ from loguru import logger
 
 from configs.config import get_cfg_defaults
 from lib.data.datasets import CustomDataset
+from lib.models.smplify import TemporalSMPLify
 from lib.models import build_network, build_body_model
+from lib.utils.transforms import matrix_to_axis_angle
 from lib.models.preproc.detector import DetectionModel
 from lib.models.preproc.extractor import FeatureExtractor
 
@@ -103,17 +105,34 @@ class WHAM_API(object):
             
             # inference
             pred = self.network(x, inits, features, mask=mask, init_root=init_root, cam_angvel=cam_angvel, return_y_up=True, **kwargs)
+
+            # --- SMPLify refinement ---
+            smplify = TemporalSMPLify(self.network.smpl, img_w=width, img_h=height, device=self.cfg.DEVICE)
+            input_keypoints = tracking_results[_id]['keypoints']
+            pred = smplify.fit(pred, input_keypoints, **kwargs)
+
+            pred_body_pose = matrix_to_axis_angle(pred['poses_body']).cpu().numpy().reshape(-1, 69)
+            pred_root = matrix_to_axis_angle(pred['poses_root_cam']).cpu().numpy().reshape(-1, 3)
+            pred_pose = np.concatenate((pred_root, pred_body_pose), axis=-1)  # (N, 72)
+            pred_betas = pred['betas'].cpu().squeeze(0).numpy()  # (10,)
+            pred_trans = (pred['trans_cam'] - self.network.output.offset).cpu().numpy()  # (N, 3)
             
             # Store results
-            results[_id]['poses_body'] = pred['poses_body'].cpu().squeeze(0).numpy()
-            results[_id]['poses_root_cam'] = pred['poses_root_cam'].cpu().squeeze(0).numpy()
-            results[_id]['betas'] = pred['betas'].cpu().squeeze(0).numpy()
-            results[_id]['verts_cam'] = (pred['verts_cam'] + pred['trans_cam'].unsqueeze(1)).cpu().numpy()
-            results[_id]['poses_root_world'] = pred['poses_root_world'].cpu().squeeze(0).numpy()
-            results[_id]['trans_world'] = pred['trans_world'].cpu().squeeze(0).numpy()
-            results[_id]['frame_id'] = frame_id
+            results[_id]['pose'] = pred_pose #pred['poses_body'].cpu().squeeze(0).numpy()
+            results[_id]['trans'] = pred_trans #pred['poses_root_cam'].cpu().squeeze(0).numpy()
+            results[_id]['betas'] = pred_betas #pred['betas'].cpu().squeeze(0).numpy()
+            results[_id]['frame_ids'] = frame_id
+
+            #results[_id]['poses_root_cam'] = pred['poses_root_cam'].cpu().squeeze(0).numpy()
+            #results[_id]['betas'] = pred['betas'].cpu().squeeze(0).numpy()
+            #results[_id]['verts_cam'] = (pred['verts_cam'] + pred['trans_cam'].unsqueeze(1)).cpu().numpy()
+            #results[_id]['poses_root_world'] = pred['poses_root_world'].cpu().squeeze(0).numpy()
+            #results[_id]['trans_world'] = pred['trans_world'].cpu().squeeze(0).numpy()
+            #results[_id]['frame_id'] = frame_id
         
-        joblib.dump(slam_results, osp.join(output_dir, 'wham_results.pth'))
+        #joblib.dump(slam_results, osp.join(output_dir, 'wham_results.pth'))
+        #with open(osp.join(output_dir, "output.npz"), 'wb') as f:
+        #    np.savez(f, slam_results)
         return results
     
     @torch.no_grad()
