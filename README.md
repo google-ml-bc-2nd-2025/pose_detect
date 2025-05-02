@@ -3,7 +3,7 @@
 애니매이션 포즈 추출하기 위한 모델 실행코드 입니다.
 
 ## 요구사항
-- Python 3.11 또는 3.12
+- Python 3.11 또는 3.12 / CUDA 12.x
 
 ## 프로젝트 구조
 ```
@@ -139,7 +139,7 @@ conda create -n xxxx python=3.12
 pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cu124
 
 ```
-4. MM 관련 라이브러리 빌드
+4. MM 관련 라이브러리 빌드 (10분 이상 시간 걸림)
 ```bash
 git clone https://github.com/open-mmlab/mmdetection.git
 cd mmdetection
