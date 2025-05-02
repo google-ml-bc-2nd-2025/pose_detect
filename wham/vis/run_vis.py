@@ -94,10 +94,11 @@ def run_vis_on_demo(cfg, video, results, output_pth, smpl, vis_global=True):
         frame_i += 1
     writer.close()
     cap.release()
+    np.save(osp.join(output_pth, 'animation_frames.npy'), np.array(frames))
     # --- Matplotlib animation part ---
     fig, ax = plt.subplots()
     im = ax.imshow(frames[0])
-
+    
     def update(i):
         im.set_data(frames[i])
         return [im]
