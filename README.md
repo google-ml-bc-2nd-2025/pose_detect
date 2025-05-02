@@ -139,7 +139,7 @@ conda create -n xxxx python=3.12
 pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cu124
 
 ```
-4. MM 관련 라이브러리 빌드
+4. MM 관련 라이브러리 빌드 (10분 이상 시간 걸림)
 ```bash
 git clone https://github.com/open-mmlab/mmdetection.git
 cd mmdetection
