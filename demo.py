@@ -110,7 +110,19 @@ def run(cfg,
         # inference
         pred = network(x, inits, features, mask=mask, init_root=init_root, cam_angvel=cam_angvel, return_y_up=True, **kwargs)
         
+        # matrix to axis-angle
+        pred_body_pose = matrix_to_axis_angle(pred['poses_body']).cpu().numpy().reshape(-1, 69)
+        pred_root = matrix_to_axis_angle(pred['poses_root_cam']).cpu().numpy().reshape(-1, 3)
+        pred_pose = np.concatenate((pred_root, pred_body_pose), axis=-1)  # (N, 72)
+        pred_betas = pred['betas'].cpu().squeeze(0).numpy()  # (10,)
+        pred_trans = (pred['trans_cam'] - network.output.offset).cpu().numpy()  # (N, 3)
+        
         # Store results
+        results_npy[_id]['pose'] = pred_pose #pred['poses_body'].cpu().squeeze(0).numpy()
+        results_npy[_id]['trans'] = pred_trans #pred['poses_root_cam'].cpu().squeeze(0).numpy()
+        results_npy[_id]['betas'] = pred_betas #pred['betas'].cpu().squeeze(0).numpy()
+        results_npy[_id]['frame_id'] = frame_id
+
         results[_id]['poses_body'] = pred['poses_body'].cpu().squeeze(0).numpy()
         results[_id]['poses_root_cam'] = pred['poses_root_cam'].cpu().squeeze(0).numpy()
         results[_id]['betas'] = pred['betas'].cpu().squeeze(0).numpy()
@@ -121,7 +133,7 @@ def run(cfg,
     
     if save_npy:
         with open(osp.join(output_pth, f"{video}_smpl_output.npz"), 'wb') as f:
-            np.savez(f, results)
+            np.savez(f, results_npy)
 
     # Visualize
     if visualize:
