@@ -104,5 +104,5 @@ def run_vis_on_demo(cfg, video, results, output_pth, smpl, vis_global=True):
 
     ani = FuncAnimation(fig, update, frames=len(frames), interval=1000/fps, blit=True)
     #plt.show()
-    ani.save(osp.join(output_pth, 'output.mp4'), writer='ffmpeg', fps=fps)
+    ani.save(osp.join(output_pth, f'{video}_mpl_output.mp4'), writer='ffmpeg', fps=fps)
     #ani.save(osp.join(output_pth, 'output.gif'), writer='imagemagick', fps=fps)
