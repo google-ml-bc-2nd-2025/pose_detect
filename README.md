@@ -117,6 +117,24 @@ Pose_Ext_Model/
 ```
 
 ## 설치 및 진행
+### 데이터셋 다운로드
+1. SMPL 튜닝데이터
+```bash
+# Auxiliary SMPL-related data
+wget "https://drive.google.com/uc?id=1pbmzRbWGgae6noDIyQOnohzaVnX_csUZ&export=download&confirm=t" -O 'dataset/body_models.tar.gz'
+tar -xvf dataset/body_models.tar.gz -C dataset/
+rm -rf dataset/body_models.tar.gz
+```
+2. checkpoints 다운로드
+```bash
+# Checkpoints
+mkdir checkpoints
+gdown "https://drive.google.com/uc?id=1i7kt9RlCCCNEW2aYaDWVr-G778JkLNcB&export=download&confirm=t" -O 'checkpoints/wham_vit_w_3dpw.pth.tar'
+gdown "https://drive.google.com/uc?id=19qkI-a6xuwob9_RFNSPWf1yWErwVVlks&export=download&confirm=t" -O 'checkpoints/wham_vit_bedlam_w_3dpw.pth.tar'
+gdown "https://drive.google.com/uc?id=1J6l8teyZrL0zFzHhzkC7efRhU0ZJ5G9Y&export=download&confirm=t" -O 'checkpoints/hmr2a.ckpt'
+gdown "https://drive.google.com/uc?id=1kXTV4EYb-BI3H7J-bkR3Bc4gT9zfnHGT&export=download&confirm=t" -O 'checkpoints/dpvo.pth'
+wget "https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov8m.pt" -O 'checkpoints/yolov8m.pt'
+```
 
 ### 로컬 개발 환경
 
