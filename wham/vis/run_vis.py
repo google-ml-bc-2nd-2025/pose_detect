@@ -6,6 +6,8 @@ import torch
 import imageio
 import numpy as np
 from progress.bar import Bar
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
 from .renderer import Renderer, get_global_cameras
 
@@ -53,7 +55,7 @@ def run_vis_on_demo(cfg, video, results, output_pth, smpl, vis_global=True):
         fps=fps, mode='I', format='FFMPEG', macro_block_size=1
     )
     bar = Bar('Rendering results ...', fill='#', max=length)
-    
+    frames = []
     frame_i = 0
     _global_R, _global_T = None, None
     # run rendering
@@ -86,8 +88,21 @@ def run_vis_on_demo(cfg, video, results, output_pth, smpl, vis_global=True):
             
             try: img = np.concatenate((img, img_glob), axis=1)
             except: img = np.concatenate((img, np.ones_like(img) * 255), axis=1)
-        
+        frames.append(img)
         writer.append_data(img)
         bar.next()
         frame_i += 1
     writer.close()
+    cap.release()
+    # --- Matplotlib animation part ---
+    fig, ax = plt.subplots()
+    im = ax.imshow(frames[0])
+
+    def update(i):
+        im.set_data(frames[i])
+        return [im]
+
+    ani = FuncAnimation(fig, update, frames=len(frames), interval=1000/fps, blit=True)
+    #plt.show()
+    ani.save(osp.join(output_pth, 'output.mp4'), writer='ffmpeg', fps=fps)
+    #ani.save(osp.join(output_pth, 'output.gif'), writer='imagemagick', fps=fps)
